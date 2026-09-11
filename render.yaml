@@ -7,6 +7,8 @@ services:
     envVars:
       - key: CORS_ORIGINS
         value: https://roadsense.onrender.com
+      - key: APP_ORIGIN
+        value: https://roadsense-q3k7.onrender.com
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT

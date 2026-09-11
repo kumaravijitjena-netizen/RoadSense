@@ -357,7 +357,8 @@ def authenticated_reporter_email(request: FastAPIRequest) -> str | None:
 @app.get("/auth/google/start")
 def google_start(return_to: str = "http://127.0.0.1:3000/"):
     client_id, _, redirect_uri = google_config()
-    if not return_to.startswith(("http://127.0.0.1:3000", "http://localhost:3000")):
+    allowed_origins = {"http://127.0.0.1:3000", "http://localhost:3000", os.getenv("APP_ORIGIN", "")}
+    if return_to.rstrip("/") not in {origin.rstrip("/") for origin in allowed_origins if origin}:
         raise HTTPException(status_code=400, detail="Invalid application return URL")
     state = secrets.token_urlsafe(32)
     with connect_db() as db:
@@ -381,7 +382,7 @@ def google_callback(code: str, state: str):
         db.execute("INSERT INTO google_accounts (email, access_token, refresh_token, expires_at, display_name, connected_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(email) DO UPDATE SET access_token = excluded.access_token, refresh_token = COALESCE(excluded.refresh_token, google_accounts.refresh_token), expires_at = excluded.expires_at, display_name = excluded.display_name", (email, tokens["access_token"], tokens.get("refresh_token", ""), time.time() + int(tokens.get("expires_in", 3600)), profile.get("name"), utc_now()))
         db.execute("INSERT INTO user_sessions VALUES (?, ?, ?)", (session_id, email, utc_now()))
     response = RedirectResponse(f"{state_row['return_to']}?gmail=connected")
-    response.set_cookie("roadsense_session", session_id, httponly=True, samesite="lax", secure=False, max_age=60 * 60 * 24 * 30)
+    response.set_cookie("roadsense_session", session_id, httponly=True, samesite="lax", secure=state_row["return_to"].startswith("https://"), max_age=60 * 60 * 24 * 30)
     return response
 
 
