@@ -84,6 +84,18 @@ def setup_database() -> None:
                 db.execute(f"ALTER TABLE incidents ADD COLUMN {name} {definition}")
 
 
+def ensure_default_authority() -> None:
+    """Seed the configured notification recipient when the service starts."""
+    email = os.getenv("DEFAULT_AUTHORITY_EMAIL", "").strip()
+    if not email:
+        return
+    with connect_db() as db:
+        db.execute(
+            "INSERT OR IGNORE INTO authorities (id, name, jurisdiction, email, phone, enabled, created_at) VALUES (?, ?, ?, ?, NULL, 1, ?)",
+            ("default-email-authority", os.getenv("DEFAULT_AUTHORITY_NAME", "RoadSense notifications"), "Default notification recipient", email, utc_now()),
+        )
+
+
 class AuthorityIn(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     jurisdiction: str | None = Field(default=None, max_length=160)
@@ -331,7 +343,7 @@ stream = StreamWorker()
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    setup_database(); models.load_available()
+    setup_database(); ensure_default_authority(); models.load_available()
     yield
     stream.stop()
 

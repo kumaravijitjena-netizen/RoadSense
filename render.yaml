@@ -23,6 +23,10 @@ services:
         sync: false
       - key: SMTP_PASSWORD
         sync: false
+      - key: DEFAULT_AUTHORITY_EMAIL
+        sync: false
+      - key: DEFAULT_AUTHORITY_NAME
+        value: RoadSense incident notifications
       - key: GOOGLE_OAUTH_CLIENT_ID
         sync: false
       - key: GOOGLE_OAUTH_CLIENT_SECRET
