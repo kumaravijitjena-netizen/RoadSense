@@ -262,7 +262,7 @@ function OperationsTools({ onReported }: { onReported: (incident: Incident) => v
       void loadCameras();
       setStream({ running: true, source_id: "browser-camera", fps: 0, error: null, model: "v2" }); setUsingDeviceCamera(true);
       void analyzeDeviceFrame();
-      detectionTimerRef.current = window.setInterval(() => void analyzeDeviceFrame(), 1500);
+      detectionTimerRef.current = window.setInterval(() => void analyzeDeviceFrame(), 3000);
       toast.success("Device camera connected");
     } catch (error) {
       const message = error instanceof DOMException && error.name === "NotAllowedError"

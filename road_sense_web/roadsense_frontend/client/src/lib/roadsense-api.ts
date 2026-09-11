@@ -53,7 +53,7 @@ export const roadsenseApi = {
   analyzeBrowserFrame: async (frame: Blob, location?: { latitude: number; longitude: number }) => {
     const body = new FormData();
     body.set("file", frame, "camera-frame.jpg");
-    const query = new URLSearchParams({ model: "v2", confidence: "0.35", source_id: "browser-camera" });
+    const query = new URLSearchParams({ model: "v2", confidence: "0.20", source_id: "browser-camera" });
     if (location) { query.set("latitude", String(location.latitude)); query.set("longitude", String(location.longitude)); }
     const response = await fetch(`${API_BASE}/streams/browser-frame?${query}`, { method: "POST", body, credentials: "include" });
     if (!response.ok) throw new Error((await response.json().catch(() => null))?.detail ?? `Request failed (${response.status})`);

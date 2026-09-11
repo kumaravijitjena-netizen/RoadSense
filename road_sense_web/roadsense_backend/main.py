@@ -409,7 +409,7 @@ async def process_browser_frame(
     request: FastAPIRequest,
     file: UploadFile = File(...),
     model: Literal["v1", "v2"] = "v2",
-    confidence: float = Query(0.35, ge=0.05, le=0.95),
+    confidence: float = Query(0.20, ge=0.05, le=0.95),
     source_id: str = Query("browser-camera", min_length=1, max_length=80),
     latitude: float | None = Query(default=None, ge=-90, le=90),
     longitude: float | None = Query(default=None, ge=-180, le=180),
