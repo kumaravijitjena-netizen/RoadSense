@@ -1,0 +1,19 @@
+{
+  "settings_version": "0.0.8",
+  "datasets_dir": "C:\\Users\\kumar\\OneDrive\\Documents\\ChatGPT\\datasets",
+  "weights_dir": "C:\\Users\\kumar\\OneDrive\\Documents\\ChatGPT\\RoadSense\\weights",
+  "runs_dir": "C:\\Users\\kumar\\OneDrive\\Documents\\ChatGPT\\RoadSense\\runs",
+  "uuid": "2078958af3df65bbb3407e93488742f15478d0edc73ae7db0de6303c090f5d94",
+  "sync": true,
+  "api_key": "",
+  "openai_api_key": "",
+  "clearml": true,
+  "comet": true,
+  "dvc": true,
+  "mlflow": true,
+  "raytune": true,
+  "tensorboard": false,
+  "wandb": false,
+  "vscode_msg": true,
+  "openvino_msg": true
+}

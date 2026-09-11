@@ -1,0 +1,40 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+
+# Local environments and package installs
+venv/
+node_modules/
+.pnpm-store/
+road_sense_web/roadsense_frontend/node_modules/
+
+# Runtime data and user-uploaded report media
+data/
+uploads/
+*.db
+*.sqlite
+*.sqlite3
+
+# Generated reports, archives, and transient output
+RoadSense_Project/
+RoadSense_Project.zip
+datasets_/
+test_results/
+screenshots/
+*.log
+__pycache__/
+*.py[cod]
+
+# Training diagnostics; keep only deployment weights.
+runs/**/train_batch*.jpg
+runs/**/val_batch*.jpg
+runs/**/results*.csv
+runs/**/results*.png
+runs/**/args.yaml
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
