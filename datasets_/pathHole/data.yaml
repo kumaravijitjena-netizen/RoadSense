@@ -1,0 +1,13 @@
+train: C:/Users/kumar/OneDrive/Desktop/New folder/datasets_/pathHole/train/images
+val: C:/Users/kumar/OneDrive/Desktop/New folder/datasets_/pathHole/valid/images
+test: C:/Users/kumar/OneDrive/Desktop/New folder/datasets_/pathHole/test/images
+
+nc: 1
+names: ['pothole']
+
+roboflow:
+  workspace: freee-wn8pc
+  project: pathhole-kfaje
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/freee-wn8pc/pathhole-kfaje/dataset/1

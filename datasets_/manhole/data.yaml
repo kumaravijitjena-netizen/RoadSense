@@ -1,0 +1,13 @@
+train: C:/Users/kumar/OneDrive/Desktop/New folder/datasets_/manhole/train/images
+val: C:/Users/kumar/OneDrive/Desktop/New folder/datasets_/manhole/valid/images
+test: C:/Users/kumar/OneDrive/Desktop/New folder/datasets_/manhole/valid/images
+
+nc: 2
+names: ['pothole', 'manhole']
+
+roboflow:
+  workspace: guardrail-kfrcg
+  project: manhole-g2twv
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/guardrail-kfrcg/manhole-g2twv/dataset/1

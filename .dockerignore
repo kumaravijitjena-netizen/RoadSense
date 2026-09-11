@@ -1,0 +1,15 @@
+.git
+.pnpm-store
+venv
+runs/venv
+**/node_modules
+**/__pycache__
+**/*.pyc
+**/*.log
+RoadSense_Project.zip
+RoadSense_Project
+road_sense_web/roadsense_backend/.env
+road_sense_web/roadsense_backend/data
+test_results
+screenshots
+datasets_
