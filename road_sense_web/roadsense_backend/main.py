@@ -21,7 +21,7 @@ from email.message import EmailMessage
 from io import BytesIO
 from pathlib import Path
 from typing import Literal
-from urllib.parse import quote, quote_plus, unquote, urlencode
+from urllib.parse import quote, quote_plus, unquote, urlencode, urlsplit
 from urllib.request import Request, urlopen
 
 import cv2
@@ -670,19 +670,36 @@ def add_attachment(message: EmailMessage, attachment: tuple[bytes, str, str] | N
 
 
 def send_email(recipient: str, subject: str, body: str, attachment: tuple[bytes, str, str] | None = None, html_body: str | None = None) -> str:
+    # Render cannot reliably open outbound SMTP sockets. A connected Gmail
+    # account uses Google's HTTPS API instead and remains the primary sender.
+    gmail_sender = os.getenv("DEFAULT_GMAIL_SENDER", "").strip().lower()
+    if gmail_sender:
+        try:
+            return send_gmail(gmail_sender, recipient, subject, body, attachment, html_body)
+        except Exception as gmail_error:
+            smtp_fallback_error = gmail_error
+        else:
+            smtp_fallback_error = None
     host, sender = os.getenv("SMTP_HOST"), os.getenv("SMTP_FROM")
     if not host or not sender:
-        raise RuntimeError("SMTP is not configured")
+        if gmail_sender:
+            raise RuntimeError(f"Default Gmail sender is unavailable: {smtp_fallback_error}")
+        raise RuntimeError("Email delivery is not configured")
     message = EmailMessage()
     message["From"], message["To"], message["Subject"] = sender, recipient, subject
     message.set_content(body)
     if html_body:
         message.add_alternative(html_body, subtype="html")
     add_attachment(message, attachment)
-    with smtplib.SMTP(host, int(os.getenv("SMTP_PORT", "587")), timeout=20) as client:
-        if os.getenv("SMTP_TLS", "true").lower() == "true": client.starttls()
-        if os.getenv("SMTP_USERNAME") and os.getenv("SMTP_PASSWORD"): client.login(os.environ["SMTP_USERNAME"], os.environ["SMTP_PASSWORD"])
-        client.send_message(message)
+    try:
+        with smtplib.SMTP(host, int(os.getenv("SMTP_PORT", "587")), timeout=20) as client:
+            if os.getenv("SMTP_TLS", "true").lower() == "true": client.starttls()
+            if os.getenv("SMTP_USERNAME") and os.getenv("SMTP_PASSWORD"): client.login(os.environ["SMTP_USERNAME"], os.environ["SMTP_PASSWORD"])
+            client.send_message(message)
+    except OSError as smtp_error:
+        if gmail_sender:
+            raise RuntimeError(f"Gmail API failed ({smtp_fallback_error}); SMTP fallback failed ({smtp_error})") from smtp_error
+        raise
     return "Email delivered to SMTP provider"
 
 
@@ -1035,7 +1052,15 @@ def verify_password_reset_code(payload: PasswordResetCodeIn):
 @app.get("/auth/google/start")
 def google_start(return_to: str = "http://127.0.0.1:3000/"):
     client_id, _, redirect_uri = google_config()
-    if not return_to.startswith(("http://127.0.0.1:3000", "http://localhost:3000")):
+    candidate = urlsplit(return_to)
+    candidate_origin = f"{candidate.scheme}://{candidate.netloc}"
+    allowed_origins = {
+        "http://127.0.0.1:3000",
+        "http://localhost:3000",
+        os.getenv("ROADSENSE_APP_URL", "").strip().rstrip("/"),
+        *[origin.strip().rstrip("/") for origin in os.getenv("CORS_ORIGINS", "").split(",")],
+    }
+    if candidate_origin not in allowed_origins:
         raise HTTPException(status_code=400, detail="Invalid application return URL")
     state = secrets.token_urlsafe(32)
     with connect_db() as db:
@@ -1059,7 +1084,7 @@ def google_callback(code: str, state: str):
         db.execute("INSERT INTO google_accounts (email, access_token, refresh_token, expires_at, display_name, connected_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(email) DO UPDATE SET access_token = excluded.access_token, refresh_token = COALESCE(excluded.refresh_token, google_accounts.refresh_token), expires_at = excluded.expires_at, display_name = excluded.display_name", (email, tokens["access_token"], tokens.get("refresh_token", ""), time.time() + int(tokens.get("expires_in", 3600)), profile.get("name"), utc_now()))
         db.execute("INSERT INTO user_sessions VALUES (?, ?, ?)", (session_id, email, utc_now()))
     response = RedirectResponse(f"{state_row['return_to']}?gmail=connected")
-    response.set_cookie("roadsense_session", session_id, httponly=True, samesite="lax", secure=False, max_age=60 * 60 * 24 * 30)
+    response.set_cookie("roadsense_session", session_id, httponly=True, samesite="lax", secure=state_row["return_to"].startswith("https://"), max_age=60 * 60 * 24 * 30)
     return response
 
 
