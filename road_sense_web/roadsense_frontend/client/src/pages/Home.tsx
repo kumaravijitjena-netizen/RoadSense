@@ -332,7 +332,7 @@ function SignalHero() {
   return (
     <section
       className="signal-hero"
-      aria-label="RoadSense live signal overview"
+      aria-label="JUNIPER live signal overview"
     >
       <div className="signal-hero__wash" />
       <DotGrid className="signal-hero__dots" />
@@ -401,7 +401,7 @@ function AppHeader() {
         </div>
         <div>
           <div className="font-display text-[17px] font-bold tracking-[-.03em] text-slate-100">
-            RoadSense<span className="text-[#f3b84b]">.</span>
+            JUNIPER<span className="text-[#f3b84b]">.</span>
           </div>
           <div className="text-[10px] font-semibold uppercase tracking-[.19em] text-slate-500">
             {t("operations")}

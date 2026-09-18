@@ -66,7 +66,7 @@ export default function AccountInfoPage() {
 
   return <main className="account-page">
     <header className="account-header">
-      <Link href="/" className="auth-brand"><span><Crosshair size={18} /></span><strong>RoadSense.</strong></Link>
+      <Link href="/" className="auth-brand"><span><Crosshair size={18} /></span><strong>JUNIPER.</strong></Link>
       <button type="button" className="account-back" onClick={() => navigate("/account")}><ArrowLeft size={15} />Account</button>
     </header>
     <section className="account-main account-main--single">
@@ -76,14 +76,14 @@ export default function AccountInfoPage() {
       <section className="account-section">
         <div className="account-section__heading"><UserRound size={18} /><div><strong>Profile</strong><span>Your report identity</span></div></div>
         <label className="account-label">Display name<input className="auth-input" value={name} onChange={event => setName(event.target.value)} /></label>
-        <label className="account-toggle"><input type="checkbox" checked={notify} onChange={event => setNotify(event.target.checked)} /><span><strong>Email updates</strong><small>Receive an update when RoadSense processes your report.</small></span></label>
+        <label className="account-toggle"><input type="checkbox" checked={notify} onChange={event => setNotify(event.target.checked)} /><span><strong>Email updates</strong><small>Receive an update when JUNIPER processes your report.</small></span></label>
         <button type="button" className="account-action" disabled={saving} onClick={() => void saveProfile()}><Save size={15} />Save profile</button>
       </section>
       <section className="account-section">
         <div className="account-section__heading"><Mail size={18} /><div><strong>Gmail delivery</strong><span>{account.gmail_connected ? "Reports can send from your connected Gmail account." : "Connect Gmail to send reports from your own account."}</span></div>{account.gmail_connected ? <CheckCircle2 size={18} /> : <button type="button" className="account-link" onClick={() => { window.location.href = roadsenseApi.googleSignInUrl(); }}>Connect</button>}</div>
       </section>
       {account.password_account && <section className="account-section">
-        <div className="account-section__heading"><KeyRound size={18} /><div><strong>Password and security</strong><span>Change your local RoadSense password.</span></div></div>
+        <div className="account-section__heading"><KeyRound size={18} /><div><strong>Password and security</strong><span>Change your local JUNIPER password.</span></div></div>
         <div className="account-passwords"><input className="auth-input" type="password" placeholder="Current password" value={currentPassword} onChange={event => setCurrentPassword(event.target.value)} /><input className="auth-input" type="password" placeholder="New password (8 characters minimum)" value={newPassword} onChange={event => setNewPassword(event.target.value)} /></div>
         <button type="button" className="account-action" disabled={saving} onClick={() => void updatePassword()}>Update password</button>
       </section>}

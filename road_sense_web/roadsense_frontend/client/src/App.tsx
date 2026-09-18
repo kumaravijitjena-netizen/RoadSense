@@ -16,7 +16,7 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 
 function LoadingScreen() {
-  return <div className="loading-screen"><div className="loading-orbit" /><div className="loading-mark">◎</div><div className="loading-word">RoadSense<span>.</span></div><div className="loading-skeleton"><i /><i /><i /></div><div className="loading-caption">Synchronizing city signal</div></div>;
+  return <div className="loading-screen"><div className="loading-orbit" /><div className="loading-mark">◎</div><div className="loading-word">JUNIPER<span>.</span></div><div className="loading-skeleton"><i /><i /><i /></div><div className="loading-caption">Synchronizing city signal</div></div>;
 }
 
 function HomeGate() {
