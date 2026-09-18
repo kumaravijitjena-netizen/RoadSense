@@ -7,6 +7,10 @@ services:
     envVars:
       - key: CORS_ORIGINS
         value: https://roadsense.onrender.com
+      - key: APP_ORIGIN
+        value: https://roadsense-q3k7.onrender.com
+      - key: ROADSENSE_DATA_DIR
+        value: /var/data
       - key: SMTP_HOST
         sync: false
       - key: SMTP_PORT
@@ -19,9 +23,17 @@ services:
         sync: false
       - key: SMTP_PASSWORD
         sync: false
+      - key: DEFAULT_AUTHORITY_EMAIL
+        sync: false
+      - key: DEFAULT_AUTHORITY_NAME
+        value: RoadSense incident notifications
       - key: GOOGLE_OAUTH_CLIENT_ID
         sync: false
       - key: GOOGLE_OAUTH_CLIENT_SECRET
         sync: false
       - key: GOOGLE_OAUTH_REDIRECT_URI
         sync: false
+    disk:
+      name: roadsense-data
+      mountPath: /var/data
+      sizeGB: 1

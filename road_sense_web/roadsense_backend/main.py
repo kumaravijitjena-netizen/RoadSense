@@ -269,6 +269,25 @@ def setup_database() -> None:
             db.execute("ALTER TABLE authorities ADD COLUMN whatsapp_enabled INTEGER NOT NULL DEFAULT 0")
 
 
+def ensure_default_authority() -> None:
+    """Seed the configured notification recipient on startup."""
+    email = os.getenv("DEFAULT_AUTHORITY_EMAIL", "").strip()
+    if not email:
+        return
+    with connect_db() as db:
+        db.execute(
+            "INSERT INTO authorities (id, name, jurisdiction, email, phone, enabled, created_at) "
+            "VALUES (?, ?, ?, ?, NULL, 1, ?) ON CONFLICT DO NOTHING",
+            (
+                "default-email-authority",
+                os.getenv("DEFAULT_AUTHORITY_NAME", "RoadSense notifications"),
+                "Default notification recipient",
+                email,
+                utc_now(),
+            ),
+        )
+
+
 def migrate_local_records(target: PostgresDatabase) -> None:
     """Copy MVP SQLite records into Supabase without replacing newer cloud records."""
     if not DB_PATH.exists():
@@ -852,6 +871,8 @@ async def lifespan(_: FastAPI):
                 raise
             print(f"Supabase startup connection interrupted; retrying ({attempt + 1}/3): {error}")
             await asyncio.sleep(2 ** attempt)
+    ensure_default_authority()
+    models.load_available()
     yield
     stream.stop()
 
@@ -1106,7 +1127,7 @@ async def process_browser_frame(
     request: FastAPIRequest,
     file: UploadFile = File(...),
     model: str = Query(DEFAULT_MODEL, min_length=1, max_length=80),
-    confidence: float = Query(0.35, ge=0.05, le=0.95),
+    confidence: float = Query(0.20, ge=0.05, le=0.95),
     source_id: str = Query("browser-camera", min_length=1, max_length=80),
     latitude: float | None = Query(default=None, ge=-90, le=90),
     longitude: float | None = Query(default=None, ge=-180, le=180),

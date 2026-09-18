@@ -51,7 +51,7 @@ export const roadsenseApi = {
   postLocation: (location: { source_id: string; latitude: number; longitude: number; accuracy_m?: number }) => request("/locations", { method: "POST", body: JSON.stringify(location) }),
   streamStatus: () => request<StreamStatus>("/streams/status"),
   smsReporting: () => request<{ enabled: boolean; number: string | null }>("/sms/reporting"),
-  startStream: () => request<StreamStatus>("/streams/start", { method: "POST", body: JSON.stringify({ source: "0", source_id: "camera-1", model: "roadsense_v8", confidence: 0.35, auto_notify: true }) }),
+  startStream: () => request<StreamStatus>("/streams/start", { method: "POST", body: JSON.stringify({ source: "0", source_id: "camera-1", model: "roadsense_v8", confidence: 0.20, auto_notify: true }) }),
   stopStream: () => request<{ status: string }>("/streams/stop", { method: "POST" }),
   updateIncident: (id: string, update: { status?: BackendIncident["status"]; details?: string }) => request<BackendIncident>(`/incidents/${id}`, { method: "PATCH", body: JSON.stringify(update) }),
   notify: (id: string) => request<{ status: string }>(`/incidents/${id}/notify`, { method: "POST" }),
@@ -84,7 +84,7 @@ export const roadsenseApi = {
   analyzeBrowserFrame: async (frame: Blob, location?: { latitude: number; longitude: number }) => {
     const body = new FormData();
     body.set("file", frame, "camera-frame.jpg");
-    const query = new URLSearchParams({ model: "roadsense_v8", confidence: "0.35", source_id: "browser-camera" });
+    const query = new URLSearchParams({ model: "roadsense_v8", confidence: "0.20", source_id: "browser-camera" });
     if (location) { query.set("latitude", String(location.latitude)); query.set("longitude", String(location.longitude)); }
     const response = await fetch(`${API_BASE}/streams/browser-frame?${query}`, { method: "POST", body, credentials: "include" });
     if (!response.ok) throw new Error((await response.json().catch(() => null))?.detail ?? `Request failed (${response.status})`);

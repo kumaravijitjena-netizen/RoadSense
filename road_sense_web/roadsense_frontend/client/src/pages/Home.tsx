@@ -807,7 +807,7 @@ function OperationsTools({
       void analyzeDeviceFrame();
       detectionTimerRef.current = window.setInterval(
         () => void analyzeDeviceFrame(),
-        1500
+        3000
       );
       toast.success("Device camera connected");
     } catch (error) {

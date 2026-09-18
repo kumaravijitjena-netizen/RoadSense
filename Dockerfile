@@ -9,6 +9,15 @@ RUN pnpm vite build --configLoader runner
 FROM python:3.10-slim
 WORKDIR /app
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 YOLO_CONFIG_DIR=/app/.ultralytics
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libglib2.0-0 \
+    libgl1 \
+    libgomp1 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    libxcb1 \
+    && rm -rf /var/lib/apt/lists/*
 COPY road_sense_web/roadsense_backend/requirements.txt ./road_sense_web/roadsense_backend/requirements.txt
 RUN pip install --no-cache-dir -r road_sense_web/roadsense_backend/requirements.txt
 COPY road_sense_web/roadsense_backend ./road_sense_web/roadsense_backend
