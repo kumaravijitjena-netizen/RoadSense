@@ -21,8 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY road_sense_web/roadsense_backend/requirements.txt ./road_sense_web/roadsense_backend/requirements.txt
 RUN pip install --no-cache-dir -r road_sense_web/roadsense_backend/requirements.txt
 COPY road_sense_web/roadsense_backend ./road_sense_web/roadsense_backend
-COPY runs/pothole_manhole_v1 ./runs/pothole_manhole_v1
-COPY runs/pothole_manhole_v2_augmented ./runs/pothole_manhole_v2_augmented
+COPY runs/roadsense_v8 ./runs/roadsense_v8
 COPY --from=frontend /app/road_sense_web/roadsense_frontend/dist ./road_sense_web/roadsense_frontend/dist
 WORKDIR /app/road_sense_web/roadsense_backend
 CMD sh -c "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8001}"
