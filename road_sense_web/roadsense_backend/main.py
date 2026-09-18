@@ -809,7 +809,9 @@ def translate_sms_to_english(message: str) -> str:
     """Translate arbitrary-language SMS text through a configured LibreTranslate-compatible service."""
     service_url = os.getenv("TRANSLATION_URL", "").strip()
     if not service_url:
-        raise RuntimeError("SMS translation is not configured")
+        # Keep the accessible SMS channel usable before a translation provider
+        # is configured. English reports are stored as entered.
+        return message
     payload = {"q": message, "source": "auto", "target": "en", "format": "text"}
     api_key = os.getenv("TRANSLATION_API_KEY", "").strip()
     if api_key:
