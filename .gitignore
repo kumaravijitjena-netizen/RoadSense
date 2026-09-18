@@ -5,9 +5,11 @@
 
 # Local environments and package installs
 venv/
+.venv/
 node_modules/
 .pnpm-store/
 road_sense_web/roadsense_frontend/node_modules/
+Ultralytics/
 
 # Runtime data and user-uploaded report media
 data/

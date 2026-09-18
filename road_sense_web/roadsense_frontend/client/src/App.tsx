@@ -4,7 +4,13 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import Home from "./pages/Home";
+import AccountPage from "./pages/Account";
+import AccountInfoPage from "./pages/AccountInfo";
+import AuthorityPage from "./pages/Authority";
+import AuthoritySignIn from "./pages/AuthoritySignIn";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
@@ -20,9 +26,9 @@ function HomeGate() {
 }
 
 function Router() {
-  return <Switch><Route path="/" component={HomeGate} /><Route path="/sign-in" component={SignIn} /><Route path="/sign-up" component={SignUp} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch>;
+  return <Switch><Route path="/" component={HomeGate} /><Route path="/authority/sign-in" component={AuthoritySignIn} /><Route path="/authority" component={AuthorityPage} /><Route path="/account/info" component={AccountInfoPage} /><Route path="/account" component={AccountPage} /><Route path="/reset-password" component={ResetPassword} /><Route path="/sign-in" component={SignIn} /><Route path="/sign-up" component={SignUp} /><Route path="/404" component={NotFound} /><Route component={NotFound} /></Switch>;
 }
 
 export default function App() {
-  return <ErrorBoundary><ThemeProvider defaultTheme="dark"><TooltipProvider><Toaster position="bottom-right" duration={1000} /><Router /></TooltipProvider></ThemeProvider></ErrorBoundary>;
+  return <ErrorBoundary><LanguageProvider><ThemeProvider defaultTheme="dark"><TooltipProvider><Toaster position="bottom-right" duration={1000} /><Router /></TooltipProvider></ThemeProvider></LanguageProvider></ErrorBoundary>;
 }

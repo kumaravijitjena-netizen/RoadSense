@@ -1,6 +1,7 @@
 FROM node:22-bookworm-slim AS frontend
 WORKDIR /app/road_sense_web/roadsense_frontend
 COPY road_sense_web/roadsense_frontend/package.json road_sense_web/roadsense_frontend/pnpm-lock.yaml road_sense_web/roadsense_frontend/pnpm-workspace.yaml ./
+COPY road_sense_web/roadsense_frontend/patches ./patches
 RUN corepack enable && pnpm install --frozen-lockfile
 COPY road_sense_web/roadsense_frontend ./
 RUN pnpm vite build --configLoader runner
