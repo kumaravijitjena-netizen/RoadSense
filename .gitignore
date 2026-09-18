@@ -29,11 +29,16 @@ __pycache__/
 *.py[cod]
 
 # Training diagnostics; keep only deployment weights.
+datasets_/
+test_results/
 runs/**/train_batch*.jpg
 runs/**/val_batch*.jpg
 runs/**/results*.csv
 runs/**/results*.png
 runs/**/args.yaml
+runs/pothole_manhole_v1/
+runs/pothole_manhole_v2_augmented/
+runs/roadsense_multihazard_v3/
 
 # Editor and OS files
 .vscode/
