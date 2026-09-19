@@ -8,6 +8,7 @@ export type BackendIncident = {
   model_name: string;
   hazard_type: string;
   confidence: number;
+  detection_count: number;
   latitude: number | null;
   longitude: number | null;
   status: "open" | "acknowledged" | "resolved" | "false_positive";

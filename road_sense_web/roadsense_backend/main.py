@@ -1314,6 +1314,7 @@ async def report_incident_with_photo(
     photo: UploadFile | None = File(default=None),
 ):
     incident_id, now, image_name = str(uuid.uuid4()), utc_now(), None
+    model_name, model_confidence, detection_count = "manual-report", 1.0, 1
     location_source = location_source if latitude is not None and longitude is not None and location_source == "manual_pin" else ("reporter_device" if latitude is not None and longitude is not None else "not_supplied")
     if photo and photo.filename:
         allowed_evidence = {
@@ -1338,13 +1339,29 @@ async def report_incident_with_photo(
             raise HTTPException(status_code=413, detail=f"{'Video' if photo.content_type.startswith('video/') else 'Photo'} must be {limit_mb} MB or smaller")
         store_media(image_name, content, content_type)
         if content_type.startswith("image/"):
+            if not models.available(DEFAULT_MODEL):
+                raise HTTPException(status_code=503, detail=f"Detection model '{DEFAULT_MODEL}' is unavailable")
+            try:
+                with Image.open(BytesIO(content)) as uploaded_image:
+                    rgb_image = np.asarray(uploaded_image.convert("RGB"))
+                detections = models.predict(cv2.cvtColor(rgb_image, cv2.COLOR_RGB2BGR), DEFAULT_MODEL, 0.20)
+            except Exception as error:
+                raise HTTPException(status_code=422, detail=f"The uploaded image could not be analyzed: {error}") from error
+            model_name = DEFAULT_MODEL
+            detection_count = len(detections)
+            if detections:
+                strongest = max(detections, key=lambda detection: detection["confidence"])
+                hazard_type = strongest["class"]
+                model_confidence = strongest["confidence"]
+            else:
+                model_confidence = 0.0
             photo_gps = extract_photo_gps(content)
             if photo_gps is not None:
                 latitude, longitude = photo_gps
                 location_source = "photo_metadata"
     with connect_db() as db:
-        db.execute("INSERT INTO incidents (id, created_at, updated_at, source_id, model_name, hazard_type, confidence, latitude, longitude, accuracy_m, status, details, image_path, detection_count, reporter_name, reporter_email, location_name, address_line, area, city, postal_code, landmark, location_source) VALUES (?, ?, ?, 'citizen-report', 'manual-report', ?, 1.0, ?, ?, NULL, 'open', ?, ?, 1, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                   (incident_id, now, now, hazard_type, latitude, longitude, details, image_name, reporter_name, reporter_email, location_name, address_line, area, city, postal_code, landmark, location_source))
+        db.execute("INSERT INTO incidents (id, created_at, updated_at, source_id, model_name, hazard_type, confidence, latitude, longitude, accuracy_m, status, details, image_path, detection_count, reporter_name, reporter_email, location_name, address_line, area, city, postal_code, landmark, location_source) VALUES (?, ?, ?, 'citizen-report', ?, ?, ?, ?, ?, NULL, 'open', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                   (incident_id, now, now, model_name, hazard_type, model_confidence, latitude, longitude, details, image_name, detection_count, reporter_name, reporter_email, location_name, address_line, area, city, postal_code, landmark, location_source))
         incident = incident_by_id(db, incident_id)
     await hub.publish("incident", incident)
     background_tasks.add_task(notify_authorities, incident_id, authenticated_reporter_email(request))
